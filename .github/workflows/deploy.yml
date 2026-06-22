@@ -30,15 +30,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Paso 3: Configurar pnpm globalmente (Evita el bug de dependencias nativas de npm)
+      # Paso 3: Configurar pnpm globalmente
       - name: ⚡ Configurar pnpm
         run: npm install -g pnpm
             
-      # Paso 4: Instalar dependencias con pnpm (Resolución nativa limpia para Tailwind v4)
+      # Paso 4: Instalar dependencias con pnpm (Limpieza total de bloqueos de arquitectura)
       - name: 📦 Instalar dependencias con pnpm
         run: |
-          rm -rf node_modules package-lock.json
-          pnpm install --no-frozen-lockfile
+          rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
+          pnpm config set supportedArchitectures.os ["linux"]
+          pnpm config set supportedArchitectures.cpu ["x64"]
+          pnpm install
             
       # Paso 5: Ejecutar linting (opcional, quita si no lo usas)
       - name: 🔍 Verificar código con ESLint
