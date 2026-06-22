@@ -1,31 +1,19 @@
 {
   "name": "dashboard-for-lend-labnu",
   "version": "1.0.0",
-  "description": "This is a code bundle for Dashboard for Lend-LabNu. The original project is available at https://www.figma.com/design/vgfFRAopnMlMrCifPVOtbT/Dashboard-for-Lend-LabNu.",
-  "main": "strip-fonts.js",
+  "type": "module",
+  "description": "Dashboard for Lend-LabNu",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mariadiaz-beep/Lend-LabNu.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/mariadiaz-beep/Lend-LabNu/issues"
-  },
-  "homepage": "https://github.com/mariadiaz-beep/Lend-LabNu#readme",
   "dependencies": {
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tailwindcss": "^4.3.1",
-    "vite": "^8.0.16",
-    "vite-plugin-singlefile": "^2.3.3"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.2"
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-singlefile": "^0.13.0"
   }
 }
