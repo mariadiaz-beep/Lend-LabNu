@@ -38,8 +38,8 @@ jobs:
       - name: 📦 Instalar dependencias con pnpm
         run: |
           rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
-          pnpm config set supportedArchitectures.os ["linux"]
-          pnpm config set supportedArchitectures.cpu ["x64"]
+          echo "supportedArchitectures.os[]=linux" >> .npmrc
+          echo "supportedArchitectures.cpu[]=x64" >> .npmrc
           pnpm install
             
       # Paso 5: Ejecutar linting (opcional, quita si no lo usas)
