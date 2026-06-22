@@ -1,0 +1,95 @@
+name: 🚀 Build y Deploy MVP - Lend-LabNu
+
+# Disparadores del workflow
+on:
+  # Se ejecuta cuando hay un push a la rama principal
+  push:
+    branches:
+      - main
+      - master
+  # Permite ejecutar manualmente desde la pestaña Actions
+  workflow_dispatch:
+
+# Variables de entorno compartidas
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  build:
+    # Ejecutar en máquina Ubuntu
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Paso 1: Descargar el código del repositorio
+      - name: 📥 Descargar código del repositorio
+        uses: actions/checkout@v4
+      
+      # Paso 2: Configurar Node.js
+      - name: ⚙️ Configurar Node.js versión ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          # Cache de npm para acelerar las instalaciones futuras
+          cache: 'npm'
+      
+      # Paso 3: Instalar dependencias del proyecto
+      - name: 📦 Instalar dependencias con npm
+        run: npm install
+      
+      # Paso 4: Ejecutar linting (opcional, quita si no lo usas)
+      - name: 🔍 Verificar código con ESLint
+        run: npm run lint --if-present || true
+      
+      # Paso 5: Compilar el proyecto con Vite
+      - name: 🔨 Compilar proyecto con Vite
+        run: npm run build
+      
+      # Paso 6: Verificar que el archivo HTML fue generado
+      - name: ✅ Verificar archivo compilado
+        run: |
+          if [ -f dist/index.html ]; then
+            echo "✓ Archivo dist/index.html generado correctamente"
+            echo "Tamaño del archivo:"
+            ls -lh dist/index.html
+          else
+            echo "✗ ERROR: El archivo dist/index.html no fue generado"
+            echo "Contenido de dist/:"
+            ls -la dist/
+            exit 1
+          fi
+      
+      # Paso 7: Guardar el artefacto compilado en GitHub Actions
+      - name: 📤 Guardar artefacto compilado (disponible 30 días)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-html-${{ github.sha }}
+          path: dist/index.html
+          retention-days: 30
+      
+      # Paso 8: Crear una release automática con el HTML
+      - name: 📌 Crear Release con el archivo compilado
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/index.html
+          tag_name: build-${{ github.run_number }}
+          body: |
+            🎉 **Build #${{ github.run_number }}** compilado exitosamente
+            📅 Fecha: ${{ github.event.head_commit.timestamp }}
+            🔗 Commit: ${{ github.sha }}
+            
+            Este archivo `index.html` contiene:
+            ✅ React compilado
+            ✅ Tailwind CSS inyectado
+            ✅ Todo el JavaScript empaquetado
+            ✅ Listo para Google Apps Script HtmlService
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Paso 9: Notificación de éxito
+      - name: 🎊 Build completado exitosamente
+        if: success()
+        run: |
+          echo "✅ MVP compilado y empaquetado correctamente"
+          echo "📍 Ubicación: dist/index.html"
+          echo "🚀 Listo para usar en Google Apps Script"
