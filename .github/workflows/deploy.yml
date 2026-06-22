@@ -24,29 +24,31 @@ jobs:
       - name: 📥 Descargar código del repositorio
         uses: actions/checkout@v4
             
-      # Paso 2: Configurar Node.js
+      # Paso 2: Configurar Node.js (Sin caché para evitar binarios corruptos)
       - name: ⚙️ Configurar Node.js versión ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          # Cache de npm para acelerar las instalaciones futuras
-          cache: 'npm'
+
+      # Paso 3: Configurar pnpm globalmente (Evita el bug de dependencias nativas de npm)
+      - name: ⚡ Configurar pnpm
+        run: npm install -g pnpm
             
-      # Paso 3: Instalar dependencias del proyecto (Solución de compatibilidad de binarios)
-      - name: 📦 Instalar dependencias con npm
+      # Paso 4: Instalar dependencias con pnpm (Resolución nativa limpia para Tailwind v4)
+      - name: 📦 Instalar dependencias con pnpm
         run: |
-          rm -f package-lock.json
-          npm install
+          rm -rf node_modules package-lock.json
+          pnpm install --no-frozen-lockfile
             
-      # Paso 4: Ejecutar linting (opcional, quita si no lo usas)
+      # Paso 5: Ejecutar linting (opcional, quita si no lo usas)
       - name: 🔍 Verificar código con ESLint
-        run: npm run lint --if-present || true
+        run: pnpm run lint --if-present || true
             
-      # Paso 5: Compilar el proyecto con Vite
-      - name: 🔨 Compilar proyecto con Vite
-        run: npm run build
+      # Paso 6: Compilar el proyecto con pnpm y Vite
+      - name: 🔨 Compilar proyecto con pnpm
+        run: pnpm run build
             
-      # Paso 6: Verificar que el archivo HTML fue generado
+      # Paso 7: Verificar que el archivo HTML fue generado
       - name: ✅ Verificar archivo compilado
         run: |
           if [ -f dist/index.html ]; then
@@ -60,7 +62,7 @@ jobs:
             exit 1
           fi
             
-      # Paso 7: Guardar el artefacto compilado en GitHub Actions
+      # Paso 8: Guardar el artefacto compilado en GitHub Actions
       - name: 📤 Guardar artefacto compilado (disponible 30 días)
         uses: actions/upload-artifact@v4
         with:
@@ -68,7 +70,7 @@ jobs:
           path: dist/index.html
           retention-days: 30
             
-      # Paso 8: Crear una release automática con el HTML
+      # Paso 9: Crear una release automática con el HTML
       - name: 📌 Crear Release con el archivo compilado
         if: success()
         uses: softprops/action-gh-release@v1
@@ -88,7 +90,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
-      # Paso 9: Notificación de éxito
+      # Paso 10: Notificación de éxito
       - name: 🎊 Build completado exitosamente
         if: success()
         run: |
