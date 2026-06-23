@@ -28,7 +28,7 @@ jobs:
       - name: 📥 Descargar código del repositorio
         uses: actions/checkout@v4
             
-      # Paso 2: Configurar Node.js (Sin caché para evitar binarios corruptos)
+      # Paso 2: Configurar Node.js (Sin caché para evitar binarios corruptos o heredados de otras plataformas)
       - name: ⚙️ Configurar Node.js versión ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
@@ -54,29 +54,31 @@ jobs:
       - name: 🔨 Compilar proyecto con pnpm
         run: pnpm run build
             
-      # Paso 7: Verificar que el archivo HTML fue generado
+      # Paso 7: Verificar que el archivo HTML real fue generado y no está vacío
       - name: ✅ Verificar archivo compilado
         run: |
           if [ -f dist/index.html ]; then
-            echo "✓ Archivo dist/index.html generado correctamente"
-            echo "Tamaño del archivo:"
+            echo "✓ Archivo dist/index.html generado correctamente en la carpeta de distribución"
+            echo "Tamaño del archivo compilado:"
             ls -lh dist/index.html
+            echo "Primeras líneas del archivo compilado (Verificación de contenido):"
+            head -n 10 dist/index.html
           else
-            echo "✗ ERROR: El archivo dist/index.html no fue generado"
-            echo "Contenido de dist/:"
-            ls -la dist/
+            echo "✗ ERROR: El archivo dist/index.html no fue generado en la ruta esperada"
+            echo "Contenido del directorio raíz:"
+            ls -la
             exit 1
           fi
             
-      # Paso 8: Guardar el artefacto compilado en GitHub Actions
+      # Paso 8: Guardar la carpeta dist compilada como artefacto (Disponible por 30 días)
       - name: 📤 Guardar artefacto compilado (disponible 30 días)
         uses: actions/upload-artifact@v4
         with:
-          name: dist-html-${{ github.sha }}
-          path: dist/index.html
+          name: MVP-LendLabNu-Compilado
+          path: dist/
           retention-days: 30
             
-      # Paso 9: Crear una release automática con el HTML
+      # Paso 9: Crear una release automática con el HTML real compilado de dist/
       - name: 📌 Crear Release con el archivo compilado
         if: success()
         uses: softprops/action-gh-release@v1
@@ -89,17 +91,17 @@ jobs:
             🔗 Commit: ${{ github.sha }}
                         
             Este archivo `index.html` contiene:
-            ✅ React compilado
-            ✅ Tailwind CSS inyectado
-            ✅ Todo el JavaScript empaquetado
+            ✅ React compilado y empaquetado
+            ✅ Tailwind CSS v4 inyectado
+            ✅ Todo el JavaScript integrado en un único bloque
             ✅ Listo para Google Apps Script HtmlService
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
-      # Paso 10: Notificación de éxito
+      # Paso 10: Notificación de éxito en la consola de compilación
       - name: 🎊 Build completado exitosamente
         if: success()
         run: |
           echo "✅ MVP compilado y empaquetado correctamente"
-          echo "📍 Ubicación: dist/index.html"
+          echo "📍 Ubicación del entregable: dist/index.html"
           echo "🚀 Listo para usar en Google Apps Script"
