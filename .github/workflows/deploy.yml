@@ -18,6 +18,10 @@ jobs:
   build:
     # Ejecutar en máquina Ubuntu
     runs-on: ubuntu-latest
+    
+    # Otorgar permisos explícitos de escritura para crear Releases y subir el HTML compilado
+    permissions:
+      contents: write
         
     steps:
       # Paso 1: Descargar el código del repositorio
