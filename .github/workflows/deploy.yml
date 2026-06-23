@@ -34,13 +34,13 @@ jobs:
       - name: ⚡ Configurar pnpm
         run: npm install -g pnpm
             
-      # Paso 4: Instalar dependencias con pnpm (Limpieza total de bloqueos de arquitectura)
+      # Paso 4: Instalar dependencias con pnpm (Solución definitiva de arquitectura para Tailwind v4)
       - name: 📦 Instalar dependencias con pnpm
         run: |
-          rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
-          echo "supportedArchitectures.os[]=linux" >> .npmrc
-          echo "supportedArchitectures.cpu[]=x64" >> .npmrc
+          rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock .npmrc
+          echo "supported-architectures=os:linux,cpu:x64" > .npmrc
           pnpm install
+          pnpm add -D @tailwindcss/oxide-linux-x64-gnu
             
       # Paso 5: Ejecutar linting (opcional, quita si no lo usas)
       - name: 🔍 Verificar código con ESLint
